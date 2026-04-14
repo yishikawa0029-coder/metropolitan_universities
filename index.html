@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首都圏大学データベース</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--text:#1a1a18;--text2:#6b6b66;--text3:#9e9e98;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);--accent:#2a5caa;--d5b:#fdf0ee;--d5t:#8b2012;--d4b:#fef6e4;--d4t:#7a4e00;--d3b:#edf6e6;--d3t:#2e6617;--d2b:#e6f4ee;--d2t:#1a6645;--d1b:#f0f0ee;--d1t:#505050;--nb:#e8eef8;--nt:#1e4490;--pb:#fbeaf0;--pt:#8c2a50}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+header{background:var(--surface);border-bottom:1px solid var(--border2);padding:16px 28px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.htitle{font-size:16px;font-weight:700;white-space:nowrap}
+.htitle span{font-size:11px;font-weight:400;color:var(--text2);margin-left:8px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;flex:1;align-items:center}
+input[type=text]{padding:6px 11px;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px;width:190px;outline:none;transition:border-color .15s}
+input:focus{border-color:var(--accent);background:var(--surface)}
+select{padding:6px 26px 6px 10px;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b66' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;transition:border-color .15s}
+select:focus{border-color:var(--accent);background-color:var(--surface)}
+.stats{font-size:12px;color:var(--text3);white-space:nowrap;font-family:'DM Mono',monospace;margin-left:auto}
+.note{font-size:11px;color:var(--text3);padding:4px 28px 10px;text-align:right}
+.wrap{padding:0 28px 28px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06),0 0 0 1px var(--border)}
+thead tr{background:var(--surface2)}
+th{padding:9px 12px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--text2);text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid var(--border2);transition:color .15s}
+th:hover{color:var(--text)}
+th.asc::after{content:" \25B2";font-size:9px;color:var(--accent)}
+th.desc::after{content:" \25BC";font-size:9px;color:var(--accent)}
+td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf7}
+.uname{font-weight:500}
+.ulink{color:var(--text);text-decoration:none;font-weight:500}
+.ulink:hover{color:var(--accent);text-decoration:underline}
+.ext{font-size:10px;color:var(--text3);margin-left:2px}
+.nbadge{display:inline-block;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:#fff0c2;color:#7a5a00;margin-left:4px;vertical-align:middle}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;line-height:1.6}
+.nat{background:var(--nb);color:var(--nt)}.prv{background:var(--pb);color:var(--pt)}
+.d5{background:var(--d5b);color:var(--d5t)}.d4{background:var(--d4b);color:var(--d4t)}
+.d3{background:var(--d3b);color:var(--d3t)}.d2{background:var(--d2b);color:var(--d2t)}.d1{background:var(--d1b);color:var(--d1t)}
+.dept{font-size:11px;color:var(--text2);max-width:260px;line-height:1.6}
+.new-info{color:#b06a00;font-weight:500;display:block;margin-top:2px}
+.cc{font-size:11px;max-width:210px;line-height:1.6}
+.cn{font-weight:500;color:var(--text)}
+.cs{color:var(--text2)}
+.cs::before{content:"\1F69F "}
+.hv{font-family:'DM Mono',monospace;font-size:12px;white-space:nowrap;color:var(--text2)}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.sbadge{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:#e8f4fd;color:#1a6a9a;margin-left:4px;vertical-align:middle;white-space:nowrap;border:1px solid #b8d8f0}
+</style>
+</head>
+<body>
+<header>
+  <div class="htitle">首都圏大学データベース<span>2026年4月時点 ／ 河合塾偏差値基準</span></div>
+  <div class="controls">
+    <input type="text" id="search" placeholder="大学名・学部・駅で検索…">
+    <select id="ft"><option value="">国公立／私立：すべて</option><option value="国公立">国公立</option><option value="私立">私立</option></select>
+    <select id="ff"><option value="">系統：すべて</option><option value="文系">文系</option><option value="理系">理系</option><option value="医歯薬看護">医歯薬看護</option><option value="社会・福祉・教育">社会・福祉・教育</option><option value="芸術・体育・その他">芸術・体育・その他</option><option value="総合">総合（複数系統）</option></select>
+    <select id="fdept">
+      <option value="">学部区分：すべて</option>
+      <optgroup label="── 文系 ──">
+        <option value="文学・語学・歴史">文学・語学・歴史</option>
+        <option value="法・政治">法・政治</option>
+        <option value="経済・経営・商">経済・経営・商</option>
+        <option value="国際・外国語">国際・外国語</option>
+      </optgroup>
+      <optgroup label="── 理系 ──">
+        <option value="理・工・情報">理・工・情報</option>
+        <option value="農・生命・環境">農・生命・環境</option>
+        <option value="獣医・水産">獣医・水産</option>
+      </optgroup>
+      <optgroup label="── 医療系 ──">
+        <option value="医・歯">医・歯</option>
+        <option value="薬">薬</option>
+        <option value="看護・保健・医療技術">看護・保健・医療技術</option>
+        <option value="栄養">栄養</option>
+      </optgroup>
+      <optgroup label="── 社会系 ──">
+        <option value="教育・保育">教育・保育</option>
+        <option value="社会福祉・心理">社会福祉・心理</option>
+        <option value="体育・スポーツ">体育・スポーツ</option>
+      </optgroup>
+      <optgroup label="── 芸術・その他 ──">
+        <option value="芸術・デザイン">芸術・デザイン</option>
+        <option value="総合・教養・その他">総合・教養・その他</option>
+      </optgroup>
+    </select>
+    <select id="fd"><option value="">難易度：すべて</option><option value="5">★★★★★ 最難関</option><option value="4">★★★★ 難関</option><option value="3">★★★ 中堅上位</option><option value="2">★★ 中堅</option><option value="1">★ 標準</option><option value="s">専門職大学</option></select>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+<div class="note">★NEW = 2025〜2026年度に新設・統合・改組された学部。大学名はクリックで公式サイトへ。</div>
+<div class="wrap">
+<table>
+  <thead><tr>
+    <th data-col="name">大学名</th>
+    <th data-col="type">設置</th>
+    <th data-col="field">系統</th>
+    <th data-col="dept">学部一覧</th>
+    <th data-col="diff">難易度</th>
+    <th data-col="hv">偏差値目安</th>
+    <th>キャンパス／最寄り駅</th>
+  </tr></thead>
+  <tbody id="tbody"></tbody>
+</table>
+</div>
+<script>
+const U=[
+  /* ===== 国公立 ===== */
+  {name:"東京大学",url:"https://www.u-tokyo.ac.jp/",type:"国公立",field:"総合",
+   dept:"法・文・教育・経済・理・工・農・薬・医・教養",nd:null,diff:5,hv:"67.5〜72.5",
+   c:[{n:"本郷キャンパス",s:"本郷三丁目駅（丸ノ内線・大江戸線）"},{n:"駒場キャンパス",s:"駒場東大前駅（京王井の頭線）"}]},
+
+  {name:"東京科学大学",url:"https://www.isct.ac.jp/",type:"国公立",field:"総合",
+   dept:"医学・歯学・保健衛生・理学院・工学院・物質理工学院・情報理工学院・生命理工学院・環境社会理工学院",
+   nd:"2024年10月に東京工業大学と東京医科歯科大学が統合して発足",diff:5,hv:"65.0〜72.5",
+   c:[{n:"大岡山キャンパス（理工学系）",s:"大岡山駅（東急目黒線・大井町線）"},{n:"すずかけ台キャンパス（理工学系）",s:"すずかけ台駅（東急田園都市線）"},{n:"湯島キャンパス（医歯学系）",s:"御茶ノ水駅（JR中央・総武線／丸ノ内線）"},{n:"田町キャンパス",s:"田町駅（JR山手線・京浜東北線）"}]},
+
+  {name:"一橋大学",url:"https://www.hit-u.ac.jp/",type:"国公立",field:"文系",
+   dept:"法・商・経済・社会",nd:null,diff:5,hv:"67.5〜70.0",
+   c:[{n:"国立キャンパス",s:"国立駅（JR中央線）"},{n:"千代田キャンパス",s:"大手町駅（東京メトロ各線）"}]},
+
+  {name:"東京外国語大学",url:"https://www.tufs.ac.jp/",type:"国公立",field:"文系",
+   dept:"言語文化・国際社会",nd:null,diff:4,hv:"60.0〜65.0",
+   c:[{n:"府中キャンパス",s:"北府中駅（JR武蔵野線）"}]},
+
+  {name:"お茶の水女子大学",url:"https://www.ocha.ac.jp/",type:"国公立",field:"総合",
+   dept:"文教育・理・生活科学・共創工",nd:null,diff:4,hv:"57.5〜62.5",
+   c:[{n:"大塚キャンパス",s:"茗荷谷駅（丸ノ内線）"}]},
+
+  {name:"筑波大学",url:"https://www.tsukuba.ac.jp/",type:"国公立",field:"総合",
+   dept:"人文・社会・国際総合・教育・体育・医・情報・理工・生命環境・芸術",nd:null,diff:4,hv:"57.5〜65.0",
+   c:[{n:"つくばキャンパス",s:"つくば駅（つくばエクスプレス）"}]},
+
+  {name:"横浜国立大学",url:"https://www.ynu.ac.jp/",type:"国公立",field:"総合",
+   dept:"教育・経済・経営・理工・都市科学",nd:null,diff:4,hv:"57.5〜62.5",
+   c:[{n:"常盤台キャンパス",s:"和田町駅（相鉄本線）"}]},
+
+  {name:"千葉大学",url:"https://www.chiba-u.ac.jp/",type:"国公立",field:"総合",
+   dept:"文・法政経・教育・理・工・園芸・医・薬・看護・国際教養",nd:null,diff:4,hv:"55.0〜65.0",
+   c:[{n:"西千葉キャンパス（文・法政経・理・工）",s:"西千葉駅（JR総武線）"},{n:"亥鼻キャンパス（医・薬・看護）",s:"千葉駅（JR各線）"},{n:"松戸キャンパス（園芸）",s:"松戸駅（JR常磐線・新京成線）"}]},
+
+  {name:"埼玉大学",url:"https://www.saitama-u.ac.jp/",type:"国公立",field:"総合",
+   dept:"教養・経済・教育・理・工",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"大久保キャンパス",s:"南与野駅（JR埼京線）"}]},
+
+  {name:"東京都立大学",url:"https://www.tmu.ac.jp/",type:"国公立",field:"総合",
+   dept:"人文社会・法・経済経営・理・都市環境・システムデザイン・健康福祉",nd:null,diff:4,hv:"55.0〜62.5",
+   c:[{n:"南大沢キャンパス",s:"南大沢駅（京王相模原線）"},{n:"荒川キャンパス（健康福祉）",s:"町屋駅（千代田線・都電荒川線）"}]},
+
+  {name:"横浜市立大学",url:"https://www.yokohama-cu.ac.jp/",type:"国公立",field:"総合",
+   dept:"国際教養・国際商・理・データサイエンス・医・看護",nd:null,diff:4,hv:"55.0〜62.5",
+   c:[{n:"金沢八景キャンパス",s:"金沢八景駅（京急本線・シーサイドライン）"},{n:"福浦キャンパス（医・看護）",s:"新杉田駅（JR根岸線・シーサイドライン）"}]},
+
+  {name:"東京農工大学",url:"https://www.tuat.ac.jp/",type:"国公立",field:"理系",
+   dept:"農・工",nd:null,diff:4,hv:"55.0〜60.0",
+   c:[{n:"府中キャンパス（農）",s:"北府中駅（JR武蔵野線）"},{n:"小金井キャンパス（工）",s:"東小金井駅（JR中央線）"}]},
+
+  {name:"電気通信大学",url:"https://www.uec.ac.jp/",type:"国公立",field:"理系",
+   dept:"情報理工",nd:null,diff:3,hv:"52.5〜57.5",
+   c:[{n:"調布キャンパス",s:"調布駅（京王線）"}]},
+
+  {name:"東京学芸大学",url:"https://www.u-gakugei.ac.jp/",type:"国公立",field:"社会・福祉・教育",
+   dept:"教育（A・B・C・D類）",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"小金井キャンパス",s:"国分寺駅（JR中央線・西武国分寺線）"}]},
+
+  {name:"東京海洋大学",url:"https://www.kaiyodai.ac.jp/",type:"国公立",field:"理系",
+   dept:"海洋工・海洋生命科学（旧：海洋資源環境）",nd:null,diff:3,hv:"50.0〜55.0",
+   c:[{n:"品川キャンパス",s:"天王洲アイル駅（東京モノレール・りんかい線）"},{n:"越中島キャンパス",s:"越中島駅（JR京葉線）"}]},
+
+  {name:"東京芸術大学",url:"https://www.geidai.ac.jp/",type:"国公立",field:"芸術・体育・その他",
+   dept:"美術・音楽",nd:null,diff:5,hv:"—（実技重視）",
+   c:[{n:"上野キャンパス",s:"上野駅（JR各線・東京メトロ各線）"}]},
+
+  {name:"防衛医科大学校",url:"https://www.ndmc.ac.jp/",type:"国公立",field:"医歯薬看護",
+   dept:"医・看護",nd:null,diff:5,hv:"62.5〜65.0",
+   c:[{n:"所沢キャンパス",s:"西所沢駅（西武池袋線）"}]},
+
+  /* ===== 早慶上理ICU ===== */
+  {name:"慶應義塾大学",url:"https://www.keio.ac.jp/",type:"私立",field:"総合",
+   dept:"文・経済・法・商・医・理工・総合政策・環境情報・看護医療・薬",nd:null,diff:5,hv:"62.5〜72.5",
+   c:[{n:"三田キャンパス（文・経・法・商）",s:"三田駅（都営浅草線・三田線）"},{n:"日吉キャンパス（理工1〜2年・薬ほか）",s:"日吉駅（東急東横線・目黒線）"},{n:"矢上キャンパス（理工3〜4年）",s:"日吉駅（東急東横線・目黒線）"},{n:"SFCキャンパス（総合政策・環境情報）",s:"湘南台駅（小田急・相鉄いずみ野線）"},{n:"信濃町キャンパス（医・看護医療）",s:"信濃町駅（JR中央線）"}]},
+
+  {name:"早稲田大学",url:"https://www.waseda.jp/",type:"私立",field:"総合",
+   dept:"政治経済・法・文・文化構想・教育・商・基幹理工・創造理工・先進理工・社会科学・国際教養・人間科学・スポーツ科学",nd:null,diff:5,hv:"62.5〜70.0",
+   c:[{n:"早稲田キャンパス（政経・法・文・文化構想ほか）",s:"早稲田駅（東京メトロ東西線）"},{n:"西早稲田キャンパス（理工3学部）",s:"西早稲田駅（副都心線）"},{n:"戸山キャンパス（文・文化構想）",s:"早稲田駅（東京メトロ東西線）"},{n:"所沢キャンパス（スポーツ科学・人間科学）",s:"小手指駅（西武池袋線）"}]},
+
+  {name:"国際基督教大学（ICU）",url:"https://www.icu.ac.jp/",type:"私立",field:"文系",
+   dept:"教養（リベラルアーツ）",nd:null,diff:5,hv:"67.5〜70.0",
+   c:[{n:"三鷹キャンパス",s:"武蔵境駅（JR中央線・西武多摩川線）"}]},
+
+  {name:"上智大学",url:"https://www.sophia.ac.jp/",type:"私立",field:"総合",
+   dept:"神学・文・総合人間科学・法・経済・外国語・国際教養・理工・国際関係",nd:null,diff:4,hv:"60.0〜67.5",
+   c:[{n:"四谷キャンパス",s:"四ツ谷駅（JR中央線・丸ノ内線・南北線）"},{n:"目白聖母キャンパス（看護）",s:"下落合駅（西武新宿線）"}]},
+
+  {name:"東京理科大学",url:"https://www.tus.ac.jp/",type:"私立",field:"理系",
+   dept:"理・工・薬・経営・創域理工・先進工・創域情報",nd:"創域情報学部（情報理工学科）・理学部科学コミュニケーション学科を2026年4月新設",diff:4,hv:"55.0〜65.0",
+   c:[{n:"神楽坂キャンパス（理・工ほか）",s:"飯田橋駅（JR総武線・東京メトロ各線）"},{n:"葛飾キャンパス（創域理工・先進工）",s:"金町駅（JR常磐線）"},{n:"野田キャンパス（薬・創域理工一部）",s:"運河駅（東武野田線）"}]},
+
+  /* ===== MARCH ===== */
+  {name:"明治大学",url:"https://www.meiji.ac.jp/",type:"私立",field:"総合",
+   dept:"法・商・政治経済・文・理工・農・経営・情報コミュニケーション・国際日本・総合数理",nd:"政治経済学部に政策学科を2026年4月新設（地域行政学科再編）",diff:4,hv:"57.5〜65.0",
+   c:[{n:"和泉キャンパス（法・商・政経・文・経営・情コミュの1〜2年次）",s:"明大前駅（京王線・井の頭線）"},{n:"駿河台キャンパス（法・商・政経・文・経営・情コミュの3〜4年次）",s:"御茶ノ水駅（JR中央・総武線／丸ノ内線）"},{n:"生田キャンパス（理工・農 4年間）",s:"向ヶ丘遊園駅（小田急線）"},{n:"中野キャンパス（国際日本・総合数理 4年間）",s:"中野駅（JR中央線・東京メトロ東西線）"}]},
+
+  {name:"立教大学",url:"https://www.rikkyo.ac.jp/",type:"私立",field:"総合",
+   dept:"文・異文化コミュニケーション・経済・経営・法・社会・理・環境・観光・コミュニティ福祉・現代心理・スポーツウエルネス",nd:"環境学部（環境学科）を2026年4月新設（池袋キャンパス配置）",diff:4,hv:"57.5〜65.0",
+   c:[{n:"池袋キャンパス（文・異文コミュ・経済・経営・法・社会・理・環境 4年間）",s:"池袋駅（JR各線・東京メトロ各線）徒歩7分"},{n:"新座キャンパス（観光・コミュニティ福祉・現代心理・スポーツウエルネス 4年間）",s:"志木駅（東武東上線）徒歩15分またはバス"}]},
+
+  {name:"青山学院大学",url:"https://www.aoyama.ac.jp/",type:"私立",field:"総合",
+   dept:"文・教育人間科学・経済・法・経営・国際政治経済・総合文化政策・理工・社会情報・地球社会共生・コミュニティ人間科学",nd:null,diff:4,hv:"57.5〜65.0",
+   c:[{n:"青山キャンパス（文・教育・経済・法・経営・国政経・総文政ほか）",s:"表参道駅（銀座線・千代田線・半蔵門線）"},{n:"相模原キャンパス（理工・社会情報・地球社会共生・コミュニティ人間科学）",s:"淵野辺駅（JR横浜線）"}]},
+
+  {name:"中央大学",url:"https://www.chuo-u.ac.jp/",type:"私立",field:"総合",
+   dept:"法・経済・商・文・理工・総合政策・国際経営・国際情報・基幹理工・社会理工・先進理工",nd:"理工学部を2026年4月に基幹理工・社会理工・先進理工の3学部に再編",diff:4,hv:"55.0〜65.0",
+   c:[{n:"茗荷谷キャンパス（法）",s:"茗荷谷駅（丸ノ内線）"},{n:"多摩キャンパス（経済・商・文・総合政策・国際経営・国際情報）",s:"中央大学・明星大学駅（多摩モノレール）"},{n:"後楽園キャンパス（理工系・ビジネス）",s:"後楽園駅（丸ノ内線・南北線）"}]},
+
+  {name:"法政大学",url:"https://www.hosei.ac.jp/",type:"私立",field:"総合",
+   dept:"文・法・経済・社会・経営・人間環境・現代福祉・国際文化・キャリアデザイン・GIS・スポーツ健康・情報科学・デザイン工・理工・生命科学",nd:null,diff:4,hv:"55.0〜62.5",
+   c:[{n:"市ヶ谷キャンパス（文・法・経営・GIS・キャリアデザイン・国際文化・人間環境・デザイン工）",s:"市ケ谷駅（JR中央線・有楽町線・南北線）"},{n:"多摩キャンパス（経済・社会・現代福祉・スポーツ健康）",s:"めじろ台駅（京王高尾線）"},{n:"小金井キャンパス（理工・生命科学・情報科学）",s:"東小金井駅（JR中央線）"}]},
+
+  /* ===== 学習院・成成明学獨武 ===== */
+  {name:"学習院大学",url:"https://www.gakushuin.ac.jp/",type:"私立",field:"総合",
+   dept:"法・経済・文・理・国際社会科学",nd:"2026年4月に学習院女子大学と統合。国際文化交流学部が国際社会科学学部として合流。",diff:4,hv:"55.0〜62.5",
+   c:[{n:"目白キャンパス",s:"目白駅（JR山手線）"}]},
+
+  {name:"津田塾大学",url:"https://www.tsuda.ac.jp/",type:"私立",field:"文系",
+   dept:"学芸（英文・多文化・数学・情報科学）・総合政策",nd:null,diff:3,hv:"52.5〜57.5",
+   c:[{n:"小平キャンパス（学芸）",s:"鷹の台駅（西武国分寺線）"},{n:"千駄ヶ谷キャンパス（総合政策）",s:"千駄ヶ谷駅（JR総武線）"}]},
+
+  {name:"東京女子大学",url:"https://www.twcu.ac.jp/",type:"私立",field:"文系",
+   dept:"現代教養（人文・国際社会・心理・数理・情報）",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"杉並キャンパス",s:"西荻窪駅（JR中央線）"}]},
+
+  {name:"日本女子大学",url:"https://www.jwu.ac.jp/",type:"私立",field:"総合",
+   dept:"家政・文・人間社会・理・建築デザイン・食科学",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"目白キャンパス（家政・文・人間社会）",s:"目白駅（JR山手線）"},{n:"西生田キャンパス（理・建築デザイン・食科学）",s:"読売ランド前駅（小田急線）"}]},
+
+  {name:"成蹊大学",url:"https://www.seikei.ac.jp/",type:"私立",field:"総合",
+   dept:"法・経済・文・理工・国際共創",nd:"国際共創学部（国際共創学科）を2026年4月新設",diff:3,hv:"52.5〜57.5",
+   c:[{n:"吉祥寺キャンパス",s:"吉祥寺駅（JR中央線・京王井の頭線）"}]},
+
+  {name:"成城大学",url:"https://www.seijo.ac.jp/",type:"私立",field:"文系",
+   dept:"経済・文芸・法・社会イノベーション",nd:null,diff:3,hv:"52.5〜57.5",
+   c:[{n:"成城キャンパス",s:"成城学園前駅（小田急線）"}]},
+
+  {name:"武蔵大学",url:"https://www.musashi.ac.jp/",type:"私立",field:"文系",
+   dept:"経済・人文・社会・国際教養",nd:null,diff:3,hv:"50.0〜55.0",
+   c:[{n:"江古田キャンパス",s:"江古田駅（西武池袋線）"}]},
+
+  {name:"明治学院大学",url:"https://www.meijigakuin.ac.jp/",type:"私立",field:"文系",
+   dept:"文・経済・社会・法・国際・心理",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"白金キャンパス（文・心理・社会）",s:"白金台駅（南北線・都営三田線）"},{n:"横浜キャンパス（法・経済・国際）",s:"戸塚駅（JR東海道線・横須賀線）"}]},
+
+  {name:"國學院大學",url:"https://www.kokugakuin.ac.jp/",type:"私立",field:"文系",
+   dept:"神道文化・文・法・経済・人間開発・観光まちづくり",nd:null,diff:3,hv:"50.0〜55.0",
+   c:[{n:"渋谷キャンパス（神道文化・文・法・経済・観光まちづくり）",s:"渋谷駅（JR各線・東京メトロ各線）"},{n:"たまプラーザキャンパス（人間開発）",s:"たまプラーザ駅（東急田園都市線）"}]},
+
+  {name:"獨協大学",url:"https://www.dokkyo.ac.jp/",type:"私立",field:"文系",
+   dept:"外国語・法・経済・国際教養",nd:null,diff:3,hv:"47.5〜55.0",
+   c:[{n:"草加キャンパス",s:"獨協大学前〈草加松原〉駅（東武スカイツリーライン）"}]},
+
+  /* ===== 日東駒専 ===== */
+  {name:"日本大学",url:"https://www.nihon-u.ac.jp/",type:"私立",field:"総合",
+   dept:"法・文理・経済・商・芸術・国際関係・危機管理・スポーツ科学・理工・生産工・工・医・歯・松戸歯・生物資源科・薬・獣医",nd:null,diff:3,hv:"40.0〜62.5",
+   c:[{n:"三崎町キャンパス（法）",s:"水道橋駅（JR総武線・都営三田線）"},{n:"経済学部キャンパス（経済）",s:"水道橋駅（JR総武線・都営三田線）"},{n:"文理学部キャンパス（文理）",s:"桜上水駅（京王線）"},{n:"商学部キャンパス（商）",s:"祖師ヶ谷大蔵駅（小田急線）"},{n:"駿河台キャンパス（理工・歯）",s:"御茶ノ水駅（JR中央線・東京メトロ丸ノ内線）"},{n:"船橋キャンパス（理工一部・薬）",s:"船橋日大前駅（東葉高速線）"},{n:"医学部キャンパス（医）",s:"大山駅（東武東上線）"},{n:"芸術学部キャンパス（芸術）",s:"江古田駅（西武池袋線）"},{n:"松戸キャンパス（松戸歯・生物資源科）",s:"松戸駅（JR常磐線・新京成線）"},{n:"三軒茶屋キャンパス（危機管理・スポーツ科学）",s:"三軒茶屋駅（東急田園都市線・世田谷線）"}]},
+
+  {name:"東洋大学",url:"https://www.toyo.ac.jp/",type:"私立",field:"総合",
+   dept:"文・経済・経営・法・社会・国際・国際観光・情報連携・福祉社会デザイン・健康スポーツ科学・理工・総合情報・生命科学・食環境科学",nd:null,diff:3,hv:"47.5〜55.0",
+   c:[{n:"白山キャンパス（文・経済・経営・法・社会・国際・国際観光）",s:"白山駅（都営三田線）"},{n:"赤羽台キャンパス（情報連携・福祉社会デザイン・健康スポーツ科学）",s:"赤羽駅（JR各線）徒歩8分"},{n:"朝霞キャンパス（生命科学・食環境科学）",s:"北朝霞駅（JR武蔵野線）"},{n:"川越キャンパス（理工・総合情報）",s:"霞ヶ関駅（東武東上線）"}]},
+
+  {name:"駒澤大学",url:"https://www.komazawa-u.ac.jp/",type:"私立",field:"総合",
+   dept:"仏教・文・経済・法・経営・医療健康科学",nd:null,diff:2,hv:"45.0〜52.5",
+   c:[{n:"駒沢キャンパス",s:"駒沢大学駅（東急田園都市線）"}]},
+
+  {name:"専修大学",url:"https://www.senshu-u.ac.jp/",type:"私立",field:"総合",
+   dept:"経済・法・経営・商・文・ネットワーク情報・人間科学・国際コミュニケーション",nd:null,diff:2,hv:"45.0〜52.5",
+   c:[{n:"神田キャンパス（法・経済・商・経営・ネット情報）",s:"神田駅（JR各線・銀座線）"},{n:"生田キャンパス（文・人間科学・国際コミュ）",s:"向ヶ丘遊園駅（小田急線）"}]},
+
+  /* ===== 大東亜帝国・その他中堅私立 ===== */
+  {name:"神奈川大学",url:"https://www.kanagawa-u.ac.jp/",type:"私立",field:"総合",
+   dept:"法・経済・外国語・経営・人間科学・理・工・建築・情報",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"横浜キャンパス（法・経済・外国語・経営・人間科学）",s:"反町駅（東急東横線）"},{n:"湘南平塚キャンパス（工・理・情報・建築）",s:"平塚駅（JR東海道線）"}]},
+
+  {name:"東海大学",url:"https://www.u-tokai.ac.jp/",type:"私立",field:"総合",
+   dept:"文・文化社会・法・政治経済・教養・児童教育・経営・理・工・情報理工・建築都市・医・国際・観光・体育・健康",nd:null,diff:2,hv:"42.5〜52.5",
+   c:[{n:"湘南キャンパス（文・法・政経・経営・理・工・体育・健康・国際ほか全11学部）",s:"東海大学前駅（小田急線）"},{n:"品川キャンパス（国際・経営ほか3年次以降）",s:"品川駅（JR各線・京急線）"},{n:"伊勢原キャンパス（医）",s:"伊勢原駅よりバス（小田急線）"}]},
+
+  {name:"帝京大学",url:"https://www.teikyo-u.ac.jp/",type:"私立",field:"総合",
+   dept:"医・薬・経済・法・文・外国語・教育・理工・医療技術",nd:null,diff:2,hv:"40.0〜57.5",
+   c:[{n:"板橋キャンパス（医・薬・医療技術の大半）",s:"十条駅（JR埼京線）徒歩10分 / 王子駅（JR京浜東北線）バス"},{n:"八王子キャンパス（経済・法・文・外国語・教育・医療技術スポーツ医療）",s:"大塚・帝京大学駅（多摩モノレール）"}]},
+
+  {name:"国士舘大学",url:"https://www.kokushikan.ac.jp/",type:"私立",field:"総合",
+   dept:"政経・体育・理工・法・文・21世紀アジア・データサイエンス",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"世田谷キャンパス（法・政経・文・21世紀アジア・データサイエンス）",s:"松陰神社前駅（東急世田谷線）"},{n:"町田キャンパス（体育・理工）",s:"鶴川駅（小田急線）"}]},
+
+  {name:"大東文化大学",url:"https://www.daito.ac.jp/",type:"私立",field:"総合",
+   dept:"文・法・経済・外国語・スポーツ健康科学・社会・国際関係・経営",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"板橋キャンパス（文・法・経済・外国語・社会・経営の3〜4年次）",s:"西台駅（都営三田線）徒歩9分 / 東武練馬駅スクールバス"},{n:"東松山キャンパス（全学部1〜2年次、国際関係・スポーツ健康科学は4年間）",s:"高坂駅（東武東上線）スクールバス約7分"}]},
+
+  {name:"亜細亜大学",url:"https://www.asia.ac.jp/",type:"私立",field:"文系",
+   dept:"経営・法・国際関係・都市創造・健康スポーツ科学",nd:"健康スポーツ科学部を2026年4月新設",diff:2,hv:"40.0〜47.5",
+   c:[{n:"武蔵野キャンパス",s:"武蔵境駅（JR中央線・西武多摩川線）"}]},
+
+  {name:"桜美林大学",url:"https://www.obirin.ac.jp/",type:"私立",field:"総合",
+   dept:"リベラルアーツ・芸術文化・健康福祉・グローバルコミュニケーション・ビジネスマネジメント・航空マネジメント",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"淵野辺キャンパス（リベラルアーツ・芸術文化）",s:"淵野辺駅（JR横浜線）"},{n:"町田キャンパス（ビジネスマネジメント）",s:"町田駅（JR横浜線・小田急線）"}]},
+
+  {name:"拓殖大学",url:"https://www.takushoku-u.ac.jp/",type:"私立",field:"文系",
+   dept:"外国語・政経・商・工・国際学",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"文京キャンパス（外国語・政経・商・国際学）",s:"茗荷谷駅（丸ノ内線）"},{n:"八王子国際キャンパス（工）",s:"高尾駅（JR中央線・京王線）"}]},
+
+  {name:"文教大学",url:"https://www.bunkyo.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"教育・人間科学・文・情報・健康栄養・経営",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"越谷キャンパス（教育・人間科学・文・経営）",s:"北越谷駅（東武スカイツリーライン）"},{n:"湘南キャンパス（情報・健康栄養）",s:"辻堂駅（JR東海道線）"}]},
+
+  /* ===== 女子大 ===== */
+  {name:"白百合女子大学",url:"https://www.shirayuri.ac.jp/",type:"私立",field:"文系",
+   dept:"文・人間総合",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"仙川キャンパス",s:"仙川駅（京王線）"}]},
+
+  {name:"実践女子大学",url:"https://www.jissen.ac.jp/",type:"私立",field:"文系",
+   dept:"文・人間社会・食科学",nd:"食科学部（食料学科・管理栄養学科）を2026年4月新設",diff:2,hv:"40.0〜47.5",
+   c:[{n:"日野キャンパス（文・人間社会）",s:"豊田駅（JR中央線）"},{n:"渋谷キャンパス（食科学ほか）",s:"渋谷駅（JR各線・東京メトロ各線）"}]},
+
+  {name:"昭和女子大学",url:"https://www.swu.ac.jp/",type:"私立",field:"文系",
+   dept:"人間社会・グローバルビジネス・環境デザイン・食健康科学・総合情報",nd:"総合情報学部（データサイエンス学科・デジタルイノベーション学科）を2026年4月新設",diff:2,hv:"42.5〜50.0",
+   c:[{n:"三軒茶屋キャンパス",s:"三軒茶屋駅（東急田園都市線・世田谷線）"}]},
+
+  {name:"共立女子大学",url:"https://www.kyoritsu-wu.ac.jp/",type:"私立",field:"文系",
+   dept:"家政・文芸・国際・ビジネス・看護・児童",nd:"児童学部を2026年4月新設（家政学部から独立）",diff:2,hv:"40.0〜47.5",
+   c:[{n:"神田一ツ橋キャンパス（文芸・ビジネス・国際・児童）",s:"神保町駅（半蔵門線・都営三田線・新宿線）"},{n:"八王子看護キャンパス（看護）",s:"北八王子駅（JR八高線）"}]},
+
+  {name:"フェリス女学院大学",url:"https://www.ferris.ac.jp/",type:"私立",field:"文系",
+   dept:"文・国際交流・音楽",nd:null,diff:3,hv:"47.5〜52.5",
+   c:[{n:"緑園都市キャンパス（文・国際交流）",s:"緑園都市駅（相鉄いずみ野線）"},{n:"山手キャンパス（音楽）",s:"石川町駅（JR根岸線）"}]},
+
+  {name:"清泉女子大学",url:"https://www.seisen-u.ac.jp/",type:"私立",field:"文系",
+   dept:"文（日本語日本文・英語英文・スペイン語スペイン文・文化史）",nd:null,diff:2,hv:"42.5〜47.5",
+   c:[{n:"品川キャンパス",s:"五反田駅（JR山手線・都営浅草線・東急池上線）"}]},
+
+  {name:"大妻女子大学",url:"https://www.otsuma.ac.jp/",type:"私立",field:"文系",
+   dept:"文・家政・社会情報・比較文化・人間共生",nd:"人間共生学部を2026年4月新設（人間関係学部を改組）",diff:2,hv:"42.5〜50.0",
+   c:[{n:"千代田キャンパス（文・家政・社会情報・比較文化・人間共生）",s:"半蔵門駅（東京メトロ半蔵門線）"},{n:"多摩キャンパス（社会情報）",s:"黒川駅（小田急多摩線）"}]},
+
+  {name:"東洋英和女学院大学",url:"https://www.toyoeiwa.ac.jp/",type:"私立",field:"文系",
+   dept:"人間社会・総合心理・子ども教育・国際",nd:"2026年4月に人間科学部・国際社会学部を人間社会学部等へ再編",diff:2,hv:"42.5〜50.0",
+   c:[{n:"六本木キャンパス",s:"六本木駅（日比谷線・都営大江戸線）"}]},
+
+  {name:"跡見学園女子大学",url:"https://www.atomi.ac.jp/",type:"私立",field:"文系",
+   dept:"マネジメント・文・観光コミュニティ",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"文京キャンパス（マネジメント・文）",s:"茗荷谷駅（丸ノ内線）"},{n:"新座キャンパス（観光コミュニティ）",s:"志木駅（東武東上線）"}]},
+
+  {name:"東京家政大学",url:"https://www.tokyo-kasei.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"家政・人文・栄養・健康科学・子ども支援・社会デザイン",nd:"社会デザイン学部を2026年4月新設",diff:2,hv:"40.0〜47.5",
+   c:[{n:"板橋キャンパス（家政・人文・子ども支援・社会デザイン）",s:"板橋区役所前駅（都営三田線）"},{n:"狭山キャンパス（栄養・健康科学）",s:"狭山市駅（西武新宿線）"}]},
+
+  {name:"和洋女子大学",url:"https://www.wayo.ac.jp/",type:"私立",field:"文系",
+   dept:"人文・家政・AIライフデザイン",nd:"AIライフデザイン学部（AIライフデザイン学科）を2026年4月新設",diff:1,hv:"35.0〜42.5",
+   c:[{n:"市川キャンパス",s:"市川駅（JR総武線）"}]},
+
+  {name:"恵泉女学園大学",url:"https://www.keisen.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"人文・社会園芸",nd:null,diff:1,hv:"37.5〜42.5",
+   c:[{n:"多摩キャンパス",s:"多摩センター駅（京王相模原線・小田急多摩線・多摩モノレール）"}]},
+
+  {name:"十文字学園女子大学",url:"https://www.jumonji-u.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"人間生活・教育人文",nd:null,diff:1,hv:"35.0〜42.5",
+   c:[{n:"新座キャンパス",s:"新座駅（JR武蔵野線）"}]},
+
+  {name:"川村学園女子大学",url:"https://www.kawamura.ac.jp/",type:"私立",field:"文系",
+   dept:"教育・文・生活創造",nd:null,diff:1,hv:"35.0〜40.0",
+   c:[{n:"我孫子キャンパス",s:"我孫子駅（JR常磐線・成田線）"}]},
+
+  /* ===== 医歯薬看護 ===== */
+  {name:"東京慈恵会医科大学",url:"https://www.jikei.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・看護",nd:null,diff:5,hv:"67.5〜70.0",
+   c:[{n:"西新橋キャンパス（医）",s:"御成門駅（都営三田線）"},{n:"国領キャンパス（看護）",s:"国領駅（京王線）"}]},
+
+  {name:"順天堂大学",url:"https://www.juntendo.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・スポーツ健康科学・医療看護・保健看護・国際教養・保健医療・医療科学・健康データサイエンス",nd:null,diff:5,hv:"65.0〜70.0",
+   c:[{n:"本郷キャンパス（医）",s:"御茶ノ水駅（JR中央・総武線／丸ノ内線）"},{n:"浦安キャンパス（医療看護・保健医療・医療科学・健康データサイエンス）",s:"新浦安駅（JR京葉線）"},{n:"さくらキャンパス（スポーツ健康科学）",s:"千城台駅（千葉モノレール）"},{n:"三島キャンパス（保健看護）",s:"三島駅（JR東海道線・新幹線）"}]},
+
+  {name:"日本医科大学",url:"https://www.nms.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・医療健康科学（看護）",nd:"医療健康科学部（看護学科）を2026年4月新設",diff:5,hv:"65.0〜67.5",
+   c:[{n:"千駄木キャンパス",s:"千駄木駅（東京メトロ千代田線）"}]},
+
+  {name:"昭和大学",url:"https://www.showa-u.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・歯・薬・保健医療",nd:null,diff:4,hv:"60.0〜67.5",
+   c:[{n:"旗の台キャンパス（医・歯・保健医療）",s:"旗の台駅（東急大井町線・池上線）"},{n:"横浜キャンパス（薬）",s:"上星川駅（相鉄本線）"}]},
+
+  {name:"東京医科大学",url:"https://www.tokyo-med.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・看護",nd:null,diff:4,hv:"60.0〜65.0",
+   c:[{n:"新宿キャンパス",s:"新宿駅（JR各線・東京メトロ各線）"}]},
+
+  {name:"東邦大学",url:"https://www.toho-u.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医・薬・看護・理・健康科学",nd:null,diff:4,hv:"57.5〜65.0",
+   c:[{n:"大森キャンパス（医・看護）",s:"大森駅（JR京浜東北線）"},{n:"習志野キャンパス（薬・理・看護）",s:"津田沼駅（JR総武線）"}]},
+
+  {name:"杏林大学",url:"https://www.kyorin-u.ac.jp/",type:"私立",field:"総合",
+   dept:"医・保健・外国語・法律政治・経済経営",nd:"総合政策学部を2026年4月に法律政治学科・経済経営学科へ改組",diff:4,hv:"55.0〜65.0",
+   c:[{n:"三鷹キャンパス（医・保健）",s:"三鷹駅（JR中央線）"},{n:"井の頭キャンパス（外国語・法律政治・経済経営）",s:"吉祥寺駅（JR中央線・京王井の頭線）"}]},
+
+  {name:"北里大学",url:"https://www.kitasato-u.ac.jp/",type:"私立",field:"総合",
+   dept:"医・薬・看護・医療衛生・理・獣医・海洋生命科学・未来工学・健康科学",nd:null,diff:4,hv:"37.5〜65.0",
+   c:[{n:"相模原キャンパス（医・薬・看護・医療衛生・理・未来工学）",s:"古淵駅（JR横浜線）"},{n:"十和田キャンパス（獣医・海洋生命科学）",s:"三沢駅（青い森鉄道）"},{n:"白金キャンパス（薬1年次）",s:"白金台駅（南北線・都営三田線）"},{n:"新潟キャンパス（健康科学）",s:"六日町駅（JR上越線）"}]},
+
+  {name:"聖マリアンナ医科大学",url:"https://www.marianna-u.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"医",nd:null,diff:4,hv:"57.5〜62.5",
+   c:[{n:"宮前平キャンパス",s:"宮前平駅（東急田園都市線）"}]},
+
+  {name:"東京歯科大学",url:"https://www.tdc.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"歯",nd:null,diff:4,hv:"57.5〜62.5",
+   c:[{n:"水道橋キャンパス",s:"水道橋駅（JR総武線・都営三田線）"}]},
+
+  {name:"東京薬科大学",url:"https://www.toyaku.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"薬・生命科学",nd:null,diff:3,hv:"50.0〜57.5",
+   c:[{n:"八王子キャンパス",s:"豊田駅（JR中央線）"}]},
+
+  {name:"明治薬科大学",url:"https://www.my-pharm.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"薬",nd:null,diff:3,hv:"50.0〜55.0",
+   c:[{n:"清瀬キャンパス",s:"清瀬駅（西武池袋線）"}]},
+
+  {name:"星薬科大学",url:"https://www.hoshi.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"薬",nd:null,diff:3,hv:"50.0〜55.0",
+   c:[{n:"品川キャンパス",s:"五反田駅（JR山手線・都営浅草線・東急池上線）"}]},
+
+  {name:"昭和薬科大学",url:"https://www.shoyaku.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"薬",nd:null,diff:3,hv:"47.5〜52.5",
+   c:[{n:"町田キャンパス",s:"玉川学園前駅（小田急線）"}]},
+
+  {name:"女子栄養大学",url:"https://www.eiyo.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"栄養・食生活科学",nd:null,diff:3,hv:"47.5〜52.5",
+   c:[{n:"坂戸キャンパス",s:"坂戸駅（東武東上線）"}]},
+
+  {name:"明海大学",url:"https://www.meikai.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"歯・外国語・経済・不動産・ホスピタリティツーリズム",nd:null,diff:2,hv:"40.0〜50.0",
+   c:[{n:"坂戸キャンパス（外国語・経済・不動産・ホスピタリティ）",s:"若葉駅（東武東上線）"},{n:"浦安キャンパス（歯）",s:"新浦安駅（JR京葉線）"}]},
+
+  {name:"神奈川歯科大学",url:"https://www.kdu.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"歯・看護・リハビリテーション",nd:null,diff:2,hv:"37.5〜47.5",
+   c:[{n:"横須賀キャンパス",s:"横須賀中央駅（京急本線）"}]},
+
+  {name:"帝京平成大学",url:"https://www.thu.ac.jp/",type:"私立",field:"総合",
+   dept:"薬・看護・健康医療スポーツ・ヒューマンケア・共創",nd:"共創学部（デジタル共創学科）を2026年4月新設",diff:2,hv:"37.5〜45.0",
+   c:[{n:"中野キャンパス（薬・看護・健康医療スポーツ）",s:"中野駅（JR中央線・東京メトロ東西線）"},{n:"池袋キャンパス（ヒューマンケア・共創）",s:"池袋駅（JR各線・東京メトロ各線）"}]},
+
+  {name:"鶴見大学",url:"https://www.tsurumi-u.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"歯・文",nd:null,diff:2,hv:"37.5〜47.5",
+   c:[{n:"鶴見キャンパス",s:"鶴見駅（JR京浜東北線・鶴見線）"}]},
+
+  /* ===== 理工系 ===== */
+  {name:"芝浦工業大学",url:"https://www.shibaura-it.ac.jp/",type:"私立",field:"理系",
+   dept:"工・建築・システム理工（課程制再編）",nd:"システム理工学部を2026年4月にIoT・機械電気・建築環境・生命科学・数理科学の課程制に再編",diff:3,hv:"50.0〜57.5",
+   c:[{n:"豊洲キャンパス（建築4年間・工学部3〜4年次）",s:"豊洲駅（有楽町線・ゆりかもめ）"},{n:"大宮キャンパス（システム理工4年間・工学部1〜2年次）",s:"北与野駅（JR埼京線）"}]},
+
+  {name:"東京都市大学",url:"https://www.tcu.ac.jp/",type:"私立",field:"理系",
+   dept:"工・建築都市デザイン・情報工・環境学・メディア情報学・デザイン・都市生活・人間科学",nd:null,diff:3,hv:"47.5〜55.0",
+   c:[{n:"世田谷キャンパス（工・情報工・建築都市デザイン・デザイン・都市生活・人間科学）",s:"尾山台駅（東急大井町線）"},{n:"横浜キャンパス（環境学・メディア情報学）",s:"日吉駅（東急東横線・目黒線）"}]},
+
+  {name:"工学院大学",url:"https://www.kogakuin.ac.jp/",type:"私立",field:"理系",
+   dept:"先進工・工・建築・情報",nd:null,diff:3,hv:"47.5〜52.5",
+   c:[{n:"八王子キャンパス（全学部1・2年次）",s:"八王子駅（JR中央線・京王線）バス15〜20分"},{n:"新宿キャンパス（全学部3年次〜）",s:"新宿駅（JR各線・東京メトロ各線）徒歩5分"}]},
+
+  {name:"麻布大学",url:"https://www.azabu-u.ac.jp/",type:"私立",field:"理系",
+   dept:"獣医・生命・環境科学",nd:null,diff:3,hv:"47.5〜57.5",
+   c:[{n:"淵野辺キャンパス",s:"淵野辺駅（JR横浜線）"}]},
+
+  {name:"日本獣医生命科学大学",url:"https://www.nvlu.ac.jp/",type:"私立",field:"理系",
+   dept:"獣医・応用生命科学",nd:null,diff:3,hv:"47.5〜55.0",
+   c:[{n:"武蔵境キャンパス",s:"武蔵境駅（JR中央線・西武多摩川線）"}]},
+
+  {name:"東京農業大学",url:"https://www.nodai.ac.jp/",type:"私立",field:"理系",
+   dept:"農・応用生物科学・生命科学・地域環境科学・国際食料情報・生物産業",nd:null,diff:3,hv:"47.5〜55.0",
+   c:[{n:"世田谷キャンパス（農・応用生物・生命科学）",s:"千歳船橋駅（小田急線）"},{n:"厚木キャンパス（農・地域環境科学）",s:"本厚木駅（小田急線）"},{n:"網走キャンパス（生物産業）",s:"網走駅（JR石北本線）"}]},
+
+  {name:"東京電機大学",url:"https://www.dendai.ac.jp/",type:"私立",field:"理系",
+   dept:"工・未来科学・システムデザイン工・情報環境",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"東京千住キャンパス（工・未来科学・情報環境）",s:"北千住駅（JR常磐線・東京メトロ各線）"},{n:"鳩山キャンパス（システムデザイン工）",s:"高坂駅（東武東上線）バス15分"}]},
+
+  {name:"東京工科大学",url:"https://www.teu.ac.jp/",type:"私立",field:"理系",
+   dept:"工・コンピュータサイエンス・メディア・応用生物・デザイン・医療保健",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"八王子キャンパス（工・CS・メディア・応用生物・デザイン）",s:"八王子みなみ野駅（JR横浜線）"},{n:"蒲田キャンパス（医療保健）",s:"蒲田駅（JR京浜東北線・東急池上線・多摩川線）"}]},
+
+  {name:"千葉工業大学",url:"https://www.it-chiba.ac.jp/",type:"私立",field:"理系",
+   dept:"工・創造工・情報科学・社会システム科学",nd:null,diff:2,hv:"40.0〜50.0",
+   c:[{n:"津田沼キャンパス（工・情報科学・社会システム）",s:"津田沼駅（JR総武線）"},{n:"新習志野キャンパス（創造工）",s:"新習志野駅（JR京葉線）"}]},
+
+  {name:"帝京科学大学",url:"https://www.teikyo-u.ac.jp/",type:"私立",field:"理系",
+   dept:"生命環境・医療科学・教育人文",nd:null,diff:2,hv:"37.5〜45.0",
+   c:[{n:"東京西キャンパス（生命環境・教育人文）",s:"上野原市（富士急バス）"},{n:"千住キャンパス（医療科学）",s:"北千住駅（JR常磐線・東京メトロ各線）"}]},
+
+  {name:"埼玉工業大学",url:"https://www.sit.ac.jp/",type:"私立",field:"理系",
+   dept:"工・人間社会",nd:null,diff:1,hv:"35.0〜42.5",
+   c:[{n:"深谷キャンパス",s:"岡部駅（JR高崎線）"}]},
+
+  /* ===== 芸術・体育 ===== */
+  {name:"多摩美術大学",url:"https://www.tamabi.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"美術（絵画・彫刻・工芸・グラフィックデザイン・生産デザイン・環境デザイン・情報デザイン・芸術学）",nd:null,diff:3,hv:"—（実技重視）",
+   c:[{n:"八王子キャンパス（美術・グラフィックデザインほか）",s:"南多摩駅（JR南武線）"},{n:"上野毛キャンパス（情報デザインほか）",s:"上野毛駅（東急大井町線）"}]},
+
+  {name:"武蔵野美術大学",url:"https://www.musabi.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"造形（日本画・油絵・版画・彫刻・視覚伝達デザイン・工芸工業デザイン・空間演出デザイン・建築・基礎デザイン・芸術文化）・クリエイティブイノベーション",nd:null,diff:3,hv:"—（実技重視）",
+   c:[{n:"鷹の台キャンパス（造形）",s:"鷹の台駅（西武国分寺線）"},{n:"市ヶ谷キャンパス（クリエイティブイノベーション）",s:"市ケ谷駅（JR中央線・有楽町線・南北線）"}]},
+
+  {name:"女子美術大学",url:"https://www.joshibi.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"芸術（美術・デザイン・アート・デザイン表現）",nd:null,diff:2,hv:"—（実技重視）",
+   c:[{n:"相模原キャンパス（芸術）",s:"相模大野駅（小田急線）"},{n:"杉並キャンパス（短大）",s:"高円寺駅（JR中央線）"}]},
+
+  {name:"東京造形大学",url:"https://www.zokei.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"造形（美術・デザイン）",nd:null,diff:2,hv:"—（実技重視）",
+   c:[{n:"相原キャンパス",s:"相原駅（JR横浜線）"}]},
+
+  {name:"日本体育大学",url:"https://www.nittai.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"体育・スポーツマネジメント・児童スポーツ教育・保健医療",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"世田谷キャンパス（体育・スポーツマネジメント）",s:"用賀駅（東急田園都市線）"},{n:"横浜・健志台キャンパス（児童スポーツ教育・保健医療）",s:"中山駅（JR横浜線・横浜市営地下鉄）"}]},
+
+  {name:"早稲田大学（スポーツ科学部）",url:"https://www.waseda.jp/fsci/",type:"私立",field:"芸術・体育・その他",
+   dept:"スポーツ科学",nd:null,diff:4,hv:"60.0〜65.0",
+   c:[{n:"所沢キャンパス",s:"小手指駅（西武池袋線）"}]},
+
+  /* ===== 社会・福祉・教育・その他総合 ===== */
+  {name:"武蔵野大学",url:"https://www.musashino-u.ac.jp/",type:"私立",field:"総合",
+   dept:"文・法・経済・経営・グローバルビジネス・工・データサイエンス・アントレプレナーシップ・人間科学・教育・ウェルネス・看護・薬",nd:null,diff:2,hv:"40.0〜55.0",
+   c:[{n:"武蔵野キャンパス（文・法・経済・グローバルビジネスほか）",s:"武蔵境駅（JR中央線・西武多摩川線）"},{n:"有明キャンパス（看護・工・データサイエンスほか）",s:"東京テレポート駅（りんかい線）"}]},
+
+  {name:"玉川大学",url:"https://www.tamagawa.ac.jp/",type:"私立",field:"総合",
+   dept:"教育・文・芸術・工・農・経営・リベラルアーツ・脳科学",nd:null,diff:2,hv:"40.0〜50.0",
+   c:[{n:"玉川キャンパス",s:"玉川学園前駅（小田急線）"}]},
+
+  {name:"東京経済大学",url:"https://www.tku.ac.jp/",type:"私立",field:"文系",
+   dept:"経済・経営・コミュニケーション・現代法",nd:null,diff:2,hv:"45.0〜50.0",
+   c:[{n:"国分寺キャンパス",s:"国分寺駅（JR中央線・西武国分寺線）"}]},
+
+  {name:"東京国際大学",url:"https://www.tiu.ac.jp/",type:"私立",field:"文系",
+   dept:"商・経済・言語コミュニケーション・国際関係・人間社会・医療健康",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"川越キャンパス",s:"的場駅（東武東上線）"},{n:"池袋キャンパス",s:"池袋駅（JR各線・東京メトロ各線）"}]},
+
+  {name:"関東学院大学",url:"https://www.kanto-gakuin.ac.jp/",type:"私立",field:"総合",
+   dept:"法・経済・経営・社会・理工・建築・情報・栄養・看護・教育・国際文化",nd:"情報学部・国際文化学部を2026年4月新設・改組",diff:2,hv:"37.5〜47.5",
+   c:[{n:"金沢八景キャンパス（法・経済・栄養・看護ほか）",s:"金沢八景駅（京急本線・シーサイドライン）"},{n:"横浜・関内キャンパス（経営・社会）",s:"関内駅（JR根岸線・横浜市営地下鉄）"}]},
+
+  {name:"目白大学",url:"https://www.mejiro.ac.jp/",type:"私立",field:"総合",
+   dept:"社会・心理・経営・外国語・メディア・保健医療・看護",nd:null,diff:2,hv:"37.5〜47.5",
+   c:[{n:"目白キャンパス（社会・心理・経営・外国語・メディア）",s:"下落合駅（西武新宿線）"},{n:"さいたま岩槻キャンパス（保健医療・看護）",s:"岩槻駅（東武野田線）"}]},
+
+  {name:"立正大学",url:"https://www.ris.ac.jp/",type:"私立",field:"総合",
+   dept:"仏教・文・経済・経営・法・社会福祉・心理・地球環境科学・データサイエンス",nd:null,diff:2,hv:"40.0〜50.0",
+   c:[{n:"品川キャンパス（仏教・文・経済・経営・法・社会福祉・心理・データサイエンス）",s:"大崎広小路駅（東急池上線）"},{n:"熊谷キャンパス（地球環境科学）",s:"熊谷駅（JR高崎線・秩父鉄道）"}]},
+
+  {name:"二松学舎大学",url:"https://www.nishogakusha-u.ac.jp/",type:"私立",field:"文系",
+   dept:"文・国際政治経済",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"九段キャンパス",s:"九段下駅（東西線・半蔵門線・都営新宿線）"}]},
+
+  {name:"東京成徳大学",url:"https://www.tsc.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"人文・経営・応用心理・子ども",nd:null,diff:1,hv:"37.5〜42.5",
+   c:[{n:"北区キャンパス（人文・応用心理・子ども）",s:"王子駅（JR京浜東北線・南北線）"},{n:"深谷キャンパス（経営）",s:"深谷駅（JR高崎線）"}]},
+
+  {name:"東京福祉大学",url:"https://www.tokyo-fukushi.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"社会福祉・心理・保育・教育・国際交流",nd:null,diff:1,hv:"35.0〜42.5",
+   c:[{n:"池袋キャンパス（社会福祉・教育・心理）",s:"池袋駅（JR各線・東京メトロ各線）"},{n:"伊勢崎キャンパス（保育）",s:"新伊勢崎駅（東武伊勢崎線）"}]},
+
+  {name:"聖徳大学",url:"https://www.seitoku.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"教育・心理・福祉・音楽・人間栄養",nd:null,diff:1,hv:"35.0〜42.5",
+   c:[{n:"松戸キャンパス",s:"松戸駅（JR常磐線・新京成線）"}]},
+
+  {name:"江戸川大学",url:"https://www.edogawa-u.ac.jp/",type:"私立",field:"文系",
+   dept:"社会・メディアコミュニケーション",nd:null,diff:1,hv:"35.0〜40.0",
+   c:[{n:"流山キャンパス",s:"流山おおたかの森駅（東武野田線・つくばエクスプレス）"}]},
+
+  {name:"淑徳大学",url:"https://www.shukutoku.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"総合福祉・コミュニティ政策・教育・看護栄養・経営・地域創生",nd:null,diff:1,hv:"37.5〜45.0",
+   c:[{n:"東京キャンパス（総合福祉・コミュニティ政策・教育）",s:"西荻窪駅（JR中央線）"},{n:"千葉キャンパス（看護栄養・経営・地域創生）",s:"志津駅（JR総武線バス）"}]},
+
+  {name:"文教大学",url:"https://www.bunkyo.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"教育・人間科学・文・情報・健康栄養・経営",nd:null,diff:2,hv:"42.5〜50.0",
+   c:[{n:"越谷キャンパス（教育・人間科学・文・経営）",s:"北越谷駅（東武スカイツリーライン）"},{n:"湘南キャンパス（情報・健康栄養）",s:"辻堂駅（JR東海道線）"}]},
+
+  {name:"千葉商科大学",url:"https://www.cuc.ac.jp/",type:"私立",field:"文系",
+   dept:"商経・人間社会・政策情報・サービス創造・国際教養",nd:null,diff:2,hv:"40.0〜47.5",
+   c:[{n:"市川キャンパス",s:"国府台駅（京成本線）"}]},
+
+  {name:"城西大学",url:"https://www.josai.ac.jp/",type:"私立",field:"総合",
+   dept:"経済・現代政策・理・薬・経営・観光",nd:null,diff:2,hv:"37.5〜50.0",
+   c:[{n:"坂戸キャンパス",s:"坂戸駅（東武東上線）"}]},
+
+  {name:"平成国際大学",url:"https://www.hiu.ac.jp/",type:"私立",field:"文系",
+   dept:"法・スポーツ健康・情報デザイン",nd:"情報デザイン学部を2026年4月新設",diff:1,hv:"35.0〜40.0",
+   c:[{n:"加須キャンパス",s:"加須駅（東武伊勢崎線）"}]},
+
+  {name:"上武大学",url:"https://www.josai.ac.jp/",type:"私立",field:"社会・福祉・教育",
+   dept:"ビジネス情報・看護",nd:null,diff:1,hv:"35.0〜42.5",
+   c:[{n:"前橋キャンパス（ビジネス情報）",s:"駒形駅（JR両毛線）"},{n:"伊勢崎キャンパス（看護）",s:"伊勢崎駅（東武伊勢崎線・JR両毛線）"}]},
+
+  {name:"西武文理大学",url:"https://www.seibu-bunri.ac.jp/",type:"私立",field:"文系",
+   dept:"サービス経営",nd:null,diff:1,hv:"35.0〜40.0",
+   c:[{n:"狭山キャンパス",s:"狭山市駅（西武新宿線）"}]},
+
+  /* ===== 専門職大学（首都圏） ===== */
+  {name:"国際ファッション専門職大学",url:"https://www.piif.ac.jp/",type:"私立",field:"芸術・体育・その他",
+   dept:"国際ファッション（ファッションクリエイション・ファッションビジネス）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"東京キャンパス",s:"新宿駅西口（JR・小田急・京王・地下鉄各線）徒歩3分"}]},
+
+  {name:"東京国際工科専門職大学",url:"https://www.iput.ac.jp/tokyo/",type:"私立",field:"理系",
+   dept:"工科（情報工学・デジタルエンタテインメント）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"新宿キャンパス（コクーンタワー）",s:"新宿駅西口（JR・小田急・京王・地下鉄各線）徒歩2分"}]},
+
+  {name:"情報経営イノベーション専門職大学（iU）",url:"https://www.i-u.ac.jp/",type:"私立",field:"理系",
+   dept:"情報経営イノベーション（ICT・ビジネス・グローバル）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"墨田キャンパス",s:"小村井駅（東武亀戸線）徒歩5分"}]},
+
+  {name:"東京保健医療専門職大学",url:"https://www.tpu.ac.jp/",type:"私立",field:"医歯薬看護",
+   dept:"リハビリテーション（理学療法・作業療法）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"板橋キャンパス",s:"板橋本町駅（都営三田線）徒歩5分"}]},
+
+  {name:"東京情報デザイン専門職大学",url:"https://www.tid.ac.jp/",type:"私立",field:"理系",
+   dept:"情報デザイン（IT・AI・サイバーセキュリティ）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"江戸川キャンパス",s:"平井駅南口（JR総武緩行線）徒歩8分"}]},
+
+  {name:"グローバルBiz専門職大学",url:"https://gpu.ac.jp/",type:"私立",field:"文系",
+   dept:"グローバルビジネス（ICT・経営・国際ビジネス）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"川崎キャンパス",s:"川崎駅（JR東海道線・京浜東北線・南武線）徒歩4分"}]},
+
+  {name:"ビューティ＆ウェルネス専門職大学",url:"https://www.miss-paris.ac.jp/bwpu/",type:"私立",field:"芸術・体育・その他",
+   dept:"ビューティ＆ウェルネス（美容・健康・経営）",
+   nd:null,diff:null,hv:"—（専門職大学）",senmon:true,
+   c:[{n:"横浜都筑キャンパス",s:"中川駅（横浜市営地下鉄ブルーライン）徒歩14分 / たまプラーザ駅（東急田園都市線）バス"}]},
+];
+
+const DL={5:"★★★★★ 最難関",4:"★★★★ 難関",3:"★★★ 中堅上位",2:"★★ 中堅",1:"★ 標準"};
+const DC={5:"d5",4:"d4",3:"d3",2:"d2",1:"d1"};
+let sCol=null,sDir=1;
+
+// 区分 → マッチキーワード（学部名に含まれる文字列）
+const DEPT_MAP={
+  "文学・語学・歴史":["文","文学","語","語学","言語","日本語","英文","史","歴史","哲","芸術学","文芸","神道","東洋思想","人文"],
+  "法・政治":["法","政治","政経","政策"],
+  "経済・経営・商":["経済","経営","商","会計","ビジネス","マネジメント","サービス経営","データサイエンス","情報経営","国際商"],
+  "国際・外国語":["国際","外国語","グローバル","異文化","国際関係","国際教養","国際文化","国際コミュニケーション","国際政治経済","国際社会科学","国際社会","国際教育"],
+  "理・工・情報":["理","工","情報","理工","システム","電気","機械","建築","土木","コンピュータ","IT","デジタル","AI","数学","数理","物理","化学","材料","応用化学","電子","通信","創域情報","先進工","基幹理工","社会理工","先進理工","未来工学","情報連携"],
+  "農・生命・環境":["農","生命","環境","バイオ","食","食品","栄養科学","食環境","生物","生物資源","生産","地域環境","応用生物"],
+  "獣医・水産":["獣医","海洋","水産","動物"],
+  "医・歯":["医","歯"],
+  "薬":["薬"],
+  "看護・保健・医療技術":["看護","保健","医療","リハビリ","作業療法","理学療法","放射線","臨床","健康医療","医療衛生","保健衛生","保健医療","保健看護","医療看護","健康科学"],
+  "栄養":["栄養","食料学","管理栄養"],
+  "教育・保育":["教育","保育","児童","教員","幼児","小学","子ども"],
+  "社会福祉・心理":["社会福祉","心理","福祉","社会","コミュニティ","人間科学","人間社会","総合福祉"],
+  "体育・スポーツ":["体育","スポーツ"],
+  "芸術・デザイン":["芸術","美術","音楽","デザイン","造形","映像","演劇","舞台","クリエイティブ"],
+  "総合・教養・その他":["教養","総合","リベラルアーツ","観光","ホスピタリティ","航空","宗教","仏教","神学","不動産","福祉社会デザイン","AIライフデザイン","共創","共生"]
+};
+
+function matchDeptGroup(deptStr, group){
+  const keys=DEPT_MAP[group];
+  if(!keys)return false;
+  const parts=deptStr.split('・').map(x=>x.trim());
+  return parts.some(p=>keys.some(k=>p.includes(k)));
+}
+
+function deptHighlight(deptStr, group){
+  if(!group)return deptStr;
+  const keys=DEPT_MAP[group]||[];
+  return deptStr.split('・').map(p=>{
+    const t=p.trim();
+    return keys.some(k=>t.includes(k))
+      ?`<span style="background:var(--nb);color:var(--nt);border-radius:3px;padding:0 3px;font-weight:500">${t}</span>`
+      :t;
+  }).join('・');
+}
+
+function cHTML(arr){
+  return arr.map(x=>`<div style="margin-bottom:3px"><span class="cn">${x.n}</span><br><span class="cs">${x.s}</span></div>`).join('');
+}
+
+function deptHTML(u, activeGroup){
+  return deptHighlight(u.dept, activeGroup)+(u.nd?`<span class="new-info">[新] ${u.nd}</span>`:'');
+}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const ft=document.getElementById('ft').value;
+  const ff=document.getElementById('ff').value;
+  const fd=document.getElementById('fd').value;
+  const fdept=document.getElementById('fdept').value;
+  let d=U.filter(u=>{
+    if(q){
+      const ct=u.c.map(x=>x.n+x.s).join('').toLowerCase();
+      if(!u.name.toLowerCase().includes(q)&&!u.dept.toLowerCase().includes(q)&&!ct.includes(q)&&!(u.nd||'').toLowerCase().includes(q))return false;
+    }
+    if(ft&&u.type!==ft)return false;
+    if(ff&&u.field!==ff)return false;
+    if(fd==='s'){if(!u.senmon)return false;}
+    else if(fd){if(u.senmon||u.diff!==parseInt(fd))return false;}
+    if(fdept&&!matchDeptGroup(u.dept,fdept))return false;
+    return true;
+  });
+  if(sCol){
+    d=[...d].sort((a,b)=>{
+      let av=a[sCol],bv=b[sCol];
+      return typeof av==='string'?sDir*av.localeCompare(bv,'ja'):sDir*(av-bv);
+    });
+  }
+  document.getElementById('stats').textContent=`${d.length} / ${U.length} 校`;
+  const tb=document.getElementById('tbody');
+  if(!d.length){tb.innerHTML=`<tr><td colspan="7" class="empty">該当する大学が見つかりません</td></tr>`;return;}
+  tb.innerHTML=d.map(u=>`<tr>
+    <td><a class="ulink" href="${u.url}" target="_blank" rel="noopener">${u.name}<span class="ext">↗</span></a>${u.nd?`<span class="nbadge">★NEW</span>`:''} ${u.senmon?`<span class="sbadge">専門職大学</span>`:''}</td>
+    <td><span class="badge ${u.type==='国公立'?'nat':'prv'}">${u.type}</span></td>
+    <td>${u.field}</td>
+    <td class="dept">${deptHTML(u,fdept)}</td>
+    <td>${u.senmon?`<span style="font-size:11px;color:var(--text2)">専門職大学</span>`:`<span class="badge ${DC[u.diff]}">${DL[u.diff]}</span>`}</td>
+    <td class="hv">${u.hv}</td>
+    <td class="cc">${cHTML(u.c)}</td>
+  </tr>`).join('');
+}
+
+['search','ft','ff','fd','fdept'].forEach(id=>{
+  document.getElementById(id).addEventListener(id==='search'?'input':'change',render);
+});
+document.querySelectorAll('th[data-col]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const c=th.dataset.col;
+    if(sCol===c)sDir*=-1;else{sCol=c;sDir=1;}
+    document.querySelectorAll('th').forEach(t=>t.className='');
+    th.className=sDir===1?'asc':'desc';
+    render();
+  });
+});
+render();
+</script>
+</body>
+</html>
