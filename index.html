@@ -56,7 +56,7 @@ tr:hover td{background:#fafaf7}
   <div class="controls">
     <input type="text" id="search" placeholder="大学名・学部・駅で検索…">
     <select id="ft"><option value="">国公立／私立：すべて</option><option value="国公立">国公立</option><option value="私立">私立</option></select>
-    <select id="ff"><option value="">系統：すべて</option><option value="文系">文系</option><option value="理系">理系</option><option value="医歯薬看護">医歯薬看護</option><option value="社会・福祉・教育">社会・福祉・教育</option><option value="芸術・体育・その他">芸術・体育・その他</option><option value="総合">総合（複数系統）</option></select>
+
     <select id="fdept">
       <option value="">学部区分：すべて</option>
       <optgroup label="── 文系 ──">
@@ -96,7 +96,6 @@ tr:hover td{background:#fafaf7}
   <thead><tr>
     <th data-col="name">大学名</th>
     <th data-col="type">設置</th>
-    <th data-col="field">系統</th>
     <th data-col="dept">学部一覧</th>
     <th data-col="diff">難易度</th>
     <th data-col="hv">偏差値目安</th>
@@ -682,7 +681,6 @@ function deptHTML(u, activeGroup){
 function render(){
   const q=document.getElementById('search').value.toLowerCase();
   const ft=document.getElementById('ft').value;
-  const ff=document.getElementById('ff').value;
   const fd=document.getElementById('fd').value;
   const fdept=document.getElementById('fdept').value;
   let d=U.filter(u=>{
@@ -691,7 +689,6 @@ function render(){
       if(!u.name.toLowerCase().includes(q)&&!u.dept.toLowerCase().includes(q)&&!ct.includes(q)&&!(u.nd||'').toLowerCase().includes(q))return false;
     }
     if(ft&&u.type!==ft)return false;
-    if(ff&&u.field!==ff)return false;
     if(fd==='s'){if(!u.senmon)return false;}
     else if(fd){if(u.senmon||u.diff!==parseInt(fd))return false;}
     if(fdept&&!matchDeptGroup(u.dept,fdept))return false;
@@ -705,11 +702,10 @@ function render(){
   }
   document.getElementById('stats').textContent=`${d.length} / ${U.length} 校`;
   const tb=document.getElementById('tbody');
-  if(!d.length){tb.innerHTML=`<tr><td colspan="7" class="empty">該当する大学が見つかりません</td></tr>`;return;}
+  if(!d.length){tb.innerHTML=`<tr><td colspan="6" class="empty">該当する大学が見つかりません</td></tr>`;return;}
   tb.innerHTML=d.map(u=>`<tr>
     <td><a class="ulink" href="${u.url}" target="_blank" rel="noopener">${u.name}<span class="ext">↗</span></a>${u.nd?`<span class="nbadge">★NEW</span>`:''} ${u.senmon?`<span class="sbadge">専門職大学</span>`:''}</td>
     <td><span class="badge ${u.type==='国公立'?'nat':'prv'}">${u.type}</span></td>
-    <td>${u.field}</td>
     <td class="dept">${deptHTML(u,fdept)}</td>
     <td>${u.senmon?`<span style="font-size:11px;color:var(--text2)">専門職大学</span>`:`<span class="badge ${DC[u.diff]}">${DL[u.diff]}</span>`}</td>
     <td class="hv">${u.hv}</td>
@@ -717,7 +713,7 @@ function render(){
   </tr>`).join('');
 }
 
-['search','ft','ff','fd','fdept'].forEach(id=>{
+['search','ft','fd','fdept'].forEach(id=>{
   document.getElementById(id).addEventListener(id==='search'?'input':'change',render);
 });
 document.querySelectorAll('th[data-col]').forEach(th=>{
